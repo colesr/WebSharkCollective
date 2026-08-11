@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Forum Form</title>
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+	<div class="backdrop backdrop-one"></div>
+	<div class="backdrop backdrop-two"></div>
+
+	<div class="app-shell">
+		<header class="topbar">
+			<div class="brand-lockup">
+				<div class="brand-mark">F</div>
+				<div>
+					<p class="eyebrow">Private-first community</p>
+					<h1>Forum Form</h1>
+				</div>
+			</div>
+
+			<div class="topbar-actions">
+				<button class="ghost-button" id="openLoginBtn">Log in</button>
+				<button class="primary-button" id="newPostBtn">New post</button>
+			</div>
+		</header>
+
+		<main class="layout">
+			<aside class="sidebar card">
+				<section class="profile-panel">
+					<div class="avatar-ring" id="avatarRing">A</div>
+					<div>
+						<p class="label">Signed in as</p>
+						<h2 id="profileName">Anonymous Reader</h2>
+						<p class="subtle" id="profileHandle">Not signed in</p>
+					</div>
+				</section>
+
+				<section class="sidebar-section">
+					<div class="section-head">
+						<h3>Identity</h3>
+						<span id="identityBadge" class="status-pill">Anonymous</span>
+					</div>
+					<p class="subtle">Choose how much of yourself appears on your profile and in your posts.</p>
+					<div class="radio-stack" id="identityChoices">
+						<label><input type="radio" name="identity" value="anonymous" checked /> Anonymous</label>
+						<label><input type="radio" name="identity" value="handle" /> Use handle</label>
+						<label><input type="radio" name="identity" value="full" /> Share profile details</label>
+					</div>
+				</section>
+
+				<section class="sidebar-section">
+					<div class="section-head">
+						<h3>Profile details</h3>
+						<span class="status-pill muted">Optional</span>
+					</div>
+					<form id="profileForm" class="stack">
+						<label>
+							Display name
+							<input type="text" id="displayName" placeholder="Quiet Atlas" />
+						</label>
+						<label>
+							Handle
+							<input type="text" id="handle" placeholder="@quietatlas" />
+						</label>
+						<label>
+							Bio
+							<textarea id="bio" rows="3" placeholder="A few words about what you care about"></textarea>
+						</label>
+						<label>
+							Location
+							<input type="text" id="location" placeholder="Optional location" />
+						</label>
+					</form>
+				</section>
+
+				<section class="sidebar-section">
+					<div class="section-head">
+						<h3>Login state</h3>
+						<button class="text-button" id="logoutBtn" type="button">Log out</button>
+					</div>
+					<p class="subtle" id="authSummary">You are browsing locally without an account.</p>
+				</section>
+			</aside>
+
+			<section class="feed column">
+				<div class="hero card">
+					<div>
+						<p class="eyebrow">A calmer social layer</p>
+						<h2>Post openly, but only as much as you choose.</h2>
+					</div>
+					<p class="subtle">This first pass keeps the interaction model simple: sign in locally, choose an identity level, and publish posts with optional profile details.</p>
+				</div>
+
+				<div class="composer card">
+					<div class="section-head">
+						<h3>Create post</h3>
+						<span class="status-pill" id="composerIdentity">Anonymous</span>
+					</div>
+					<form id="postForm" class="stack">
+						<label>
+							Title
+							<input type="text" id="postTitle" maxlength="120" placeholder="What would you like to share?" />
+						</label>
+						<label>
+							Body
+							<textarea id="postBody" rows="5" maxlength="500" placeholder="Write something measured, useful, or thoughtful."></textarea>
+						</label>
+						<div class="composer-grid">
+							<label>
+								Tone tag
+								<select id="postTag">
+									<option>Discussion</option>
+									<option>Question</option>
+									<option>Update</option>
+									<option>Recommendation</option>
+								</select>
+							</label>
+							<label>
+								Identity on post
+								<select id="postIdentity">
+									<option value="anonymous">Anonymous</option>
+									<option value="handle">Handle only</option>
+									<option value="full">Profile details</option>
+								</select>
+							</label>
+						</div>
+						<div class="composer-actions">
+							<p class="subtle">You can stay anonymous, or reveal a handle and profile details for more continuity.</p>
+							<button class="primary-button" type="submit">Publish</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="feed-toolbar">
+					<div>
+						<p class="eyebrow">Community feed</p>
+						<h3 id="feedHeading">Curated for calm, not frenzy</h3>
+					</div>
+					<button class="ghost-button" id="resetDemoBtn" type="button">Reset demo data</button>
+				</div>
+
+				<div id="postList" class="post-list"></div>
+			</section>
+		</main>
+	</div>
+
+	<dialog id="loginDialog" class="modal card">
+		<form id="loginForm" class="modal-form">
+			<div class="section-head">
+				<h3>Log in</h3>
+				<button class="text-button" value="cancel" formmethod="dialog">Close</button>
+			</div>
+			<label>
+				Email
+				<input type="email" id="loginEmail" placeholder="you@example.com" required />
+			</label>
+			<label>
+				Password
+				<input type="password" id="loginPassword" placeholder="Use any local password" required />
+			</label>
+			<p class="subtle">This demo stores login state locally in your browser only.</p>
+			<button class="primary-button" type="submit">Continue</button>
+		</form>
+	</dialog>
+
+	<script src="app.js"></script>
+</body>
+</html>
