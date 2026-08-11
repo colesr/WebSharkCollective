@@ -138,7 +138,17 @@
 						<p class="eyebrow">Community feed</p>
 						<h3 id="feedHeading">Curated for calm, not frenzy</h3>
 					</div>
-					<button class="ghost-button" id="resetDemoBtn" type="button">Reset demo data</button>
+					<div class="toolbar-actions">
+						<label class="sort-control">
+							<span>Sort</span>
+							<select id="sortPosts">
+								<option value="newest">Newest</option>
+								<option value="top">Top</option>
+								<option value="discussion">Most discussed</option>
+							</select>
+						</label>
+						<button class="ghost-button" id="resetDemoBtn" type="button">Reset demo data</button>
+					</div>
 				</div>
 
 				<div id="postList" class="post-list"></div>

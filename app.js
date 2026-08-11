@@ -10,9 +10,11 @@ const defaultState = {
     location: '',
     identity: 'anonymous',
   },
+  sortBy: 'newest',
   posts: [
     {
       id: crypto.randomUUID(),
+      createdAt: Date.now() - 18 * 60 * 1000,
       title: 'A quieter network is still a network',
       body: 'A good feed can reward attention without demanding performance. Small choices about identity make the space feel more human and less exposed.',
       tag: 'Discussion',
@@ -20,9 +22,18 @@ const defaultState = {
       authorMeta: 'Posted 18 minutes ago',
       votes: 142,
       comments: 19,
+      replies: [
+        {
+          id: crypto.randomUUID(),
+          author: 'North Garden',
+          body: 'The interface makes that idea feel believable instead of just aspirational.',
+          createdAt: Date.now() - 12 * 60 * 1000,
+        },
+      ],
     },
     {
       id: crypto.randomUUID(),
+      createdAt: Date.now() - 2 * 60 * 60 * 1000,
       title: 'Minimalist profiles make trust easier to calibrate',
       body: 'Sometimes a handle is enough. Sometimes a little more context helps the conversation move forward without turning the whole thing into a personal broadcast.',
       tag: 'Update',
@@ -30,6 +41,14 @@ const defaultState = {
       authorMeta: 'Design / Europe',
       votes: 87,
       comments: 11,
+      replies: [
+        {
+          id: crypto.randomUUID(),
+          author: 'quietatlas',
+          body: 'Agreed. The trick is making the extra context optional, not demanded.',
+          createdAt: Date.now() - 95 * 60 * 1000,
+        },
+      ],
     },
   ],
 };
@@ -56,6 +75,7 @@ const elements = {
   postBody: document.getElementById('postBody'),
   postTag: document.getElementById('postTag'),
   postIdentity: document.getElementById('postIdentity'),
+  sortPosts: document.getElementById('sortPosts'),
   postList: document.getElementById('postList'),
   openLoginBtn: document.getElementById('openLoginBtn'),
   newPostBtn: document.getElementById('newPostBtn'),
@@ -82,6 +102,7 @@ function loadState() {
         ...seedState().user,
         ...(parsed.user ?? {}),
       },
+      sortBy: parsed.sortBy ?? seedState().sortBy,
       posts: Array.isArray(parsed.posts) ? parsed.posts : seedState().posts,
     };
   } catch {
@@ -93,6 +114,17 @@ let state = loadState();
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function sortPosts(posts) {
+  const items = [...posts];
+  if (state.sortBy === 'top') {
+    return items.sort((left, right) => right.votes - left.votes);
+  }
+  if (state.sortBy === 'discussion') {
+    return items.sort((left, right) => (right.comments ?? 0) - (left.comments ?? 0));
+  }
+  return items.sort((left, right) => (right.createdAt ?? 0) - (left.createdAt ?? 0));
 }
 
 function identityLabel(identity) {
@@ -170,10 +202,11 @@ function renderProfile() {
   });
 
   elements.postIdentity.value = state.user.identity;
+  elements.sortPosts.value = state.sortBy;
 }
 
 function renderPosts() {
-  elements.postList.innerHTML = state.posts
+  elements.postList.innerHTML = sortPosts(state.posts)
     .map(
       (post) => `
         <article class="post">
@@ -190,7 +223,21 @@ function renderPosts() {
               <span>${post.votes} upvotes</span>
               <span>${post.comments} comments</span>
             </div>
-            <button class="ghost-button" type="button">Keep calm</button>
+            <button class="ghost-button js-toggle-comments" type="button" data-post-id="${post.id}">Comments</button>
+          </div>
+          <div class="comment-thread hidden" id="comments-${post.id}">
+            <div class="comment-list">
+              ${(post.replies ?? []).map((reply) => `
+                <article class="comment">
+                  <strong>${escapeHtml(reply.author)}</strong>
+                  <p>${escapeHtml(reply.body)}</p>
+                </article>
+              `).join('')}
+            </div>
+            <form class="comment-form" data-post-id="${post.id}">
+              <input type="text" name="comment" maxlength="180" placeholder="Add a thoughtful comment" />
+              <button class="primary-button" type="submit">Reply</button>
+            </form>
           </div>
         </article>
       `,
@@ -230,6 +277,63 @@ elements.profileForm.addEventListener('input', () => {
 
 elements.postIdentity.addEventListener('change', () => {
   elements.composerIdentity.textContent = identityLabel(elements.postIdentity.value);
+});
+
+elements.sortPosts.addEventListener('change', () => {
+  state.sortBy = elements.sortPosts.value;
+  syncState();
+});
+
+elements.postList.addEventListener('click', (event) => {
+  const button = event.target.closest('.js-toggle-comments');
+  if (!(button instanceof HTMLButtonElement)) {
+    return;
+  }
+
+  const postId = button.dataset.postId;
+  const thread = document.getElementById(`comments-${postId}`);
+  if (thread) {
+    thread.classList.toggle('hidden');
+  }
+});
+
+elements.postList.addEventListener('submit', (event) => {
+  const form = event.target;
+  if (!(form instanceof HTMLFormElement) || !form.classList.contains('comment-form')) {
+    return;
+  }
+
+  event.preventDefault();
+  const postId = form.dataset.postId;
+  const input = form.elements.namedItem('comment');
+  if (!(input instanceof HTMLInputElement)) {
+    return;
+  }
+
+  const body = input.value.trim();
+  if (!postId || !body) {
+    return;
+  }
+
+  const post = state.posts.find((item) => item.id === postId);
+  if (!post) {
+    return;
+  }
+
+  const author = state.user.loggedIn
+    ? (state.user.displayName.trim() || state.user.handle.trim() || 'You')
+    : 'Anonymous';
+
+  post.replies = post.replies ?? [];
+  post.replies.unshift({
+    id: crypto.randomUUID(),
+    author,
+    body,
+    createdAt: Date.now(),
+  });
+  post.comments = (post.comments ?? 0) + 1;
+  input.value = '';
+  syncState();
 });
 
 elements.openLoginBtn.addEventListener('click', () => elements.loginDialog.showModal());
@@ -275,6 +379,7 @@ elements.postForm.addEventListener('submit', (event) => {
   const author = postAuthorFor(elements.postIdentity.value);
   state.posts.unshift({
     id: crypto.randomUUID(),
+    createdAt: Date.now(),
     title,
     body,
     tag: elements.postTag.value,
@@ -282,6 +387,7 @@ elements.postForm.addEventListener('submit', (event) => {
     authorMeta: author.meta,
     votes: 0,
     comments: 0,
+    replies: [],
   });
 
   elements.postForm.reset();
