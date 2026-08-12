@@ -13,7 +13,10 @@
 	<div class="app-shell">
 		<header class="topbar">
 			<div class="brand-lockup">
-				<div class="brand-mark">W</div>
+				<button class="brand-mark theme-logo-toggle" id="themeToggleBtn" type="button" aria-label="Toggle color theme">
+					<span class="logo-glyph" id="themeGlyph">W</span>
+					<span class="logo-mode" id="themeModeLabel">Light</span>
+				</button>
 				<div>
 					<p class="eyebrow">The WebShark.ai community.</p>
 					<h1>WebSharkCollective</h1>
@@ -42,7 +45,6 @@
 						<h3>Identity</h3>
 						<span id="identityBadge" class="status-pill">Anonymous</span>
 					</div>
-					<p class="subtle">Choose how much of yourself appears on your profile and in your posts.</p>
 					<div class="radio-stack" id="identityChoices">
 						<label><input type="radio" name="identity" value="anonymous" checked /> Anonymous</label>
 						<label><input type="radio" name="identity" value="handle" /> Use handle</label>
@@ -53,7 +55,7 @@
 				<section class="sidebar-section">
 					<div class="section-head">
 						<h3>Profile details</h3>
-						<span class="status-pill muted">Optional</span>
+						<span class="status-pill muted">Local</span>
 					</div>
 					<form id="profileForm" class="stack">
 						<label>
@@ -80,7 +82,46 @@
 						<h3>Local login</h3>
 						<button class="text-button" id="logoutBtn" type="button">Clear local login</button>
 					</div>
-					<p class="subtle" id="authSummary">Local login is optional. You can post and comment without signing in.</p>
+					<p class="subtle" id="authSummary">Optional local session.</p>
+				</section>
+
+				<section class="sidebar-section" id="settingsSection">
+					<div class="section-head">
+						<h3>Settings</h3>
+						<span id="settingsBadge" class="status-pill muted">Locked</span>
+					</div>
+					<p class="subtle" id="settingsHint">Log in locally to customize settings.</p>
+					<form id="settingsForm" class="stack">
+						<label>
+							Font family
+							<select id="fontStyle">
+								<option value="sans">Modern Sans</option>
+								<option value="serif">Editorial Serif</option>
+								<option value="mono">Technical Mono</option>
+							</select>
+						</label>
+						<label>
+							Theme set
+							<select id="themeStyle">
+								<option value="sand">Sand</option>
+								<option value="slate">Slate</option>
+								<option value="dusk">Dusk</option>
+							</select>
+						</label>
+						<label>
+							Accent color
+							<select id="accentStyle">
+								<option value="warm">Warm Bronze</option>
+								<option value="cool">Cool Blue</option>
+								<option value="forest">Forest</option>
+								<option value="rose">Rose</option>
+							</select>
+						</label>
+						<label class="inline-toggle">
+							<input type="checkbox" id="highMotion" />
+							<span>Highly Animated</span>
+						</label>
+					</form>
 				</section>
 			</aside>
 
@@ -88,9 +129,8 @@
 				<div class="hero card">
 					<div>
 						<p class="eyebrow">The WebShark.ai community.</p>
-						<h2>Minimal social posting with adjustable identity.</h2>
+						<h2>Minimal social network.</h2>
 					</div>
-					<p class="subtle">No required login. Optional local login adds continuity while profile identity controls how much detail appears on posts.</p>
 				</div>
 
 				<div class="composer card">
@@ -109,15 +149,6 @@
 						</label>
 						<div class="composer-grid">
 							<label>
-								Tone tag
-								<select id="postTag">
-									<option>Discussion</option>
-									<option>Question</option>
-									<option>Update</option>
-									<option>Recommendation</option>
-								</select>
-							</label>
-							<label>
 								Identity on post
 								<select id="postIdentity">
 									<option value="anonymous">Anonymous</option>
@@ -127,7 +158,6 @@
 							</label>
 						</div>
 						<div class="composer-actions">
-							<p class="subtle">You can stay anonymous, or reveal a handle and profile details for more continuity.</p>
 							<button class="primary-button" type="submit">Publish</button>
 						</div>
 					</form>
@@ -135,8 +165,8 @@
 
 				<div class="feed-toolbar">
 					<div>
-						<p class="eyebrow">Community feed</p>
-						<h3 id="feedHeading">Curated for calm, not frenzy</h3>
+						<p class="eyebrow">Feed</p>
+						<h3 id="feedHeading">Latest posts</h3>
 					</div>
 					<div class="toolbar-actions">
 						<label class="sort-control">
@@ -170,7 +200,6 @@
 				Passphrase
 				<input type="password" id="loginPassword" placeholder="Stored locally only" required />
 			</label>
-			<p class="subtle">This saves local login state in your browser only. It is never required for posting.</p>
 			<button class="primary-button" type="submit">Continue</button>
 		</form>
 	</dialog>

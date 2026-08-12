@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'websharkcollective-state-v2';
+const STORAGE_KEY = 'websharkcollective-state-v4';
 
 const defaultState = {
   user: {
@@ -9,6 +9,13 @@ const defaultState = {
     bio: '',
     location: '',
     identity: 'anonymous',
+  },
+  ui: {
+    theme: 'light',
+    themeSet: 'sand',
+    accent: 'warm',
+    font: 'sans',
+    motion: 'minimal',
   },
   sortBy: 'newest',
   posts: [],
@@ -31,10 +38,19 @@ const elements = {
   loginForm: document.getElementById('loginForm'),
   loginEmail: document.getElementById('loginEmail'),
   loginPassword: document.getElementById('loginPassword'),
+  themeToggleBtn: document.getElementById('themeToggleBtn'),
+  themeGlyph: document.getElementById('themeGlyph'),
+  themeModeLabel: document.getElementById('themeModeLabel'),
+  settingsForm: document.getElementById('settingsForm'),
+  settingsBadge: document.getElementById('settingsBadge'),
+  settingsHint: document.getElementById('settingsHint'),
+  fontStyle: document.getElementById('fontStyle'),
+  themeStyle: document.getElementById('themeStyle'),
+  accentStyle: document.getElementById('accentStyle'),
+  highMotion: document.getElementById('highMotion'),
   postForm: document.getElementById('postForm'),
   postTitle: document.getElementById('postTitle'),
   postBody: document.getElementById('postBody'),
-  postTag: document.getElementById('postTag'),
   postIdentity: document.getElementById('postIdentity'),
   sortPosts: document.getElementById('sortPosts'),
   postList: document.getElementById('postList'),
@@ -84,6 +100,10 @@ function loadState() {
       user: {
         ...seedState().user,
         ...(parsed.user ?? {}),
+      },
+      ui: {
+        ...seedState().ui,
+        ...(parsed.ui ?? {}),
       },
       sortBy: parsed.sortBy ?? seedState().sortBy,
       posts: Array.isArray(parsed.posts) ? parsed.posts.map(normalizePost) : seedState().posts,
@@ -167,6 +187,16 @@ function commenterLabel() {
   return 'Anonymous';
 }
 
+function applyTheme() {
+  document.body.dataset.theme = state.ui.theme;
+  document.body.dataset.themeSet = state.ui.themeSet;
+  document.body.dataset.accent = state.ui.accent;
+  document.body.dataset.font = state.ui.font;
+  document.body.dataset.motion = state.ui.motion;
+  elements.themeModeLabel.textContent = state.ui.theme === 'dark' ? 'Dark' : 'Light';
+  elements.themeGlyph.textContent = 'W';
+}
+
 function renderProfile() {
   const displayName = profileDisplayName();
   elements.profileName.textContent = displayName;
@@ -175,9 +205,13 @@ function renderProfile() {
   elements.identityBadge.textContent = identityLabel(state.user.identity);
   elements.composerIdentity.textContent = identityLabel(elements.postIdentity.value);
   elements.authSummary.textContent = state.user.loggedIn
-    ? `Local login active as ${state.user.email}. Posting and commenting stay available with or without login.`
-    : 'Local login is optional. You can post and comment without signing in.';
+    ? `Local login active: ${state.user.email}`
+    : 'Optional local session.';
   elements.openLoginBtn.textContent = state.user.loggedIn ? 'Local login active' : 'Local login';
+  elements.settingsBadge.textContent = state.user.loggedIn ? 'Unlocked' : 'Locked';
+  elements.settingsHint.textContent = state.user.loggedIn
+    ? 'Personalize your local interface.'
+    : 'Log in locally to customize settings.';
 
   elements.displayName.value = state.user.displayName;
   elements.handle.value = state.user.handle;
@@ -190,6 +224,16 @@ function renderProfile() {
 
   elements.postIdentity.value = state.user.identity;
   elements.sortPosts.value = state.sortBy;
+  elements.fontStyle.value = state.ui.font;
+  elements.themeStyle.value = state.ui.themeSet;
+  elements.accentStyle.value = state.ui.accent;
+  elements.highMotion.checked = state.ui.motion === 'high';
+
+  Array.from(elements.settingsForm.elements).forEach((control) => {
+    if (control instanceof HTMLInputElement || control instanceof HTMLSelectElement) {
+      control.disabled = !state.user.loggedIn;
+    }
+  });
 }
 
 function renderPosts() {
@@ -253,6 +297,7 @@ function escapeHtml(value) {
 
 function syncState() {
   saveState();
+  applyTheme();
   renderProfile();
   renderPosts();
 }
@@ -272,12 +317,29 @@ elements.profileForm.addEventListener('input', () => {
   syncState();
 });
 
+elements.settingsForm.addEventListener('input', () => {
+  if (!state.user.loggedIn) {
+    return;
+  }
+
+  state.ui.font = elements.fontStyle.value;
+  state.ui.themeSet = elements.themeStyle.value;
+  state.ui.accent = elements.accentStyle.value;
+  state.ui.motion = elements.highMotion.checked ? 'high' : 'minimal';
+  syncState();
+});
+
 elements.postIdentity.addEventListener('change', () => {
   elements.composerIdentity.textContent = identityLabel(elements.postIdentity.value);
 });
 
 elements.sortPosts.addEventListener('change', () => {
   state.sortBy = elements.sortPosts.value;
+  syncState();
+});
+
+elements.themeToggleBtn.addEventListener('click', () => {
+  state.ui.theme = state.ui.theme === 'dark' ? 'light' : 'dark';
   syncState();
 });
 
@@ -377,7 +439,7 @@ elements.postForm.addEventListener('submit', (event) => {
     createdAt: Date.now(),
     title,
     body,
-    tag: elements.postTag.value,
+    tag: 'Post',
     authorLabel: author.label,
     authorMeta: author.meta,
     votes: 0,
