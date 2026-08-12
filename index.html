@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Forum Form</title>
+	<title>WebSharkCollective</title>
 	<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -13,15 +13,15 @@
 	<div class="app-shell">
 		<header class="topbar">
 			<div class="brand-lockup">
-				<div class="brand-mark">F</div>
+				<div class="brand-mark">W</div>
 				<div>
-					<p class="eyebrow">Private-first community</p>
-					<h1>Forum Form</h1>
+					<p class="eyebrow">The WebShark.ai community.</p>
+					<h1>WebSharkCollective</h1>
 				</div>
 			</div>
 
 			<div class="topbar-actions">
-				<button class="ghost-button" id="openLoginBtn">Log in</button>
+				<button class="ghost-button" id="openLoginBtn">Local login</button>
 				<button class="primary-button" id="newPostBtn">New post</button>
 			</div>
 		</header>
@@ -31,9 +31,9 @@
 				<section class="profile-panel">
 					<div class="avatar-ring" id="avatarRing">A</div>
 					<div>
-						<p class="label">Signed in as</p>
-						<h2 id="profileName">Anonymous Reader</h2>
-						<p class="subtle" id="profileHandle">Not signed in</p>
+						<p class="label">Profile identity</p>
+						<h2 id="profileName">Anonymous</h2>
+						<p class="subtle" id="profileHandle">Local-only mode</p>
 					</div>
 				</section>
 
@@ -77,20 +77,20 @@
 
 				<section class="sidebar-section">
 					<div class="section-head">
-						<h3>Login state</h3>
-						<button class="text-button" id="logoutBtn" type="button">Log out</button>
+						<h3>Local login</h3>
+						<button class="text-button" id="logoutBtn" type="button">Clear local login</button>
 					</div>
-					<p class="subtle" id="authSummary">You are browsing locally without an account.</p>
+					<p class="subtle" id="authSummary">Local login is optional. You can post and comment without signing in.</p>
 				</section>
 			</aside>
 
 			<section class="feed column">
 				<div class="hero card">
 					<div>
-						<p class="eyebrow">A calmer social layer</p>
-						<h2>Post openly, but only as much as you choose.</h2>
+						<p class="eyebrow">The WebShark.ai community.</p>
+						<h2>Minimal social posting with adjustable identity.</h2>
 					</div>
-					<p class="subtle">This first pass keeps the interaction model simple: sign in locally, choose an identity level, and publish posts with optional profile details.</p>
+					<p class="subtle">No required login. Optional local login adds continuity while profile identity controls how much detail appears on posts.</p>
 				</div>
 
 				<div class="composer card">
@@ -147,7 +147,7 @@
 								<option value="discussion">Most discussed</option>
 							</select>
 						</label>
-						<button class="ghost-button" id="resetDemoBtn" type="button">Reset demo data</button>
+						<button class="ghost-button" id="resetDemoBtn" type="button">Reset local data</button>
 					</div>
 				</div>
 
@@ -159,7 +159,7 @@
 	<dialog id="loginDialog" class="modal card">
 		<form id="loginForm" class="modal-form">
 			<div class="section-head">
-				<h3>Log in</h3>
+				<h3>Local login (optional)</h3>
 				<button class="text-button" value="cancel" formmethod="dialog">Close</button>
 			</div>
 			<label>
@@ -167,10 +167,10 @@
 				<input type="email" id="loginEmail" placeholder="you@example.com" required />
 			</label>
 			<label>
-				Password
-				<input type="password" id="loginPassword" placeholder="Use any local password" required />
+				Passphrase
+				<input type="password" id="loginPassword" placeholder="Stored locally only" required />
 			</label>
-			<p class="subtle">This demo stores login state locally in your browser only.</p>
+			<p class="subtle">This saves local login state in your browser only. It is never required for posting.</p>
 			<button class="primary-button" type="submit">Continue</button>
 		</form>
 	</dialog>
